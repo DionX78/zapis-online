@@ -29,6 +29,7 @@ SKIP_DIRS = {
     '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox', '.cache',
     '.idea', '.vscode',
     'static', 'staticfiles', 'media',
+    'backups', 'uploads',
 }
 SKIP_FILE_PATTERNS = [
     r'.*\.pyc$', r'.*\.pyo$', r'.*\.so$', r'.*\.log$',

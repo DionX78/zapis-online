@@ -1194,3 +1194,11 @@ RAG + tools (`get_services`, `get_slots`, `book`, `get_my_history`), `knowledge_
 **Волна 2:** `waitlist`, `inbox`, `promocodes`, `promocode_usages`, `resources`, `resource_services`, `knowledge_base`.
 
 **Волна 3:** `bots`, `bonuses`, `bonus_transactions`, `payments`, `abonements`, `certificates`, `family_links`, `custom_fields`, `reviews`, `events`.
+
+## Tooling / workflow
+
+- `tools/gen_map.py` — генератор карт проекта. Запускается перед пушем.
+  - `PROJECT_MAP_SHORT.md` (≈4 КБ) — читается **первым** в каждой AI-сессии.
+  - `PROJECT_MAP.md` (полная) — справочник, читается выборочно.
+- `backups/`, `uploads/` — runtime-данные, в git не хранятся, в карту не попадают.
+- При добавлении новых крупных директорий с runtime-данными — добавлять их в `SKIP_DIRS` в `gen_map.py`.

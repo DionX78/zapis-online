@@ -1,6 +1,6 @@
 # PROJECT MAP — max_booking_bot
 
-*Сгенерировано: 2026-11-26 09:56*
+*Сгенерировано: 2026-11-26 10:01*
 *Скрипт: `tools/gen_map.py`. Файл автогенерируемый — не редактировать вручную.*
 
 ## Дерево
@@ -145,7 +145,7 @@ tools/
 
 ### `PLAN.md` (1196 стр.)
 
-### `PROJECT_MAP.md` (1430 стр.)
+### `PROJECT_MAP.md` (1307 стр.)
 
 ### `app.py` (74 стр.)
 импорты: `config`, `core`, `fastapi`, `routers`, `storage`, `truststore`
@@ -1291,7 +1291,7 @@ _пусто / без явных объявлений_
 - ƒ def get_analytics_doctor_summary(org_id, doctor_id, date_from, date_to) — Сводка по одному специалисту за период (для модалки в аналитике).
 - ƒ def find_backfill_candidates(org_id, slot_id, min_gap_hours, limit) — Кандидаты для backfill.
 
-### `tools/gen_map.py` (252 стр.)
+### `tools/gen_map.py` (293 стр.)
 - ƒ def should_skip_file(name: str) -> bool
 - ƒ def walk_dirs(root: Path) — os.walk с фильтрацией мусора и сортировкой.
 - ƒ def _func_sig(node)
@@ -1301,6 +1301,7 @@ _пусто / без явных объявлений_
 - ƒ def analyze_file(path: Path)
 - ƒ def file_lines(p: Path) -> int
 - ƒ def build_map(root: Path) -> str
+- ƒ def build_summary(root: Path) -> str
 - ƒ def main()
 
 ---

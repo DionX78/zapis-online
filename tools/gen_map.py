@@ -231,6 +231,42 @@ def build_map(root: Path) -> str:
     return '\n'.join(out)
 
 
+def build_summary(root: Path) -> str:
+    out = [f'# PROJECT MAP (SHORT) — {root.name}', '']
+    out.append(f'*Сгенерировано: {datetime.now().strftime("%Y-%m-%d %H:%M")}*')
+    out.append('')
+    out.append('## Дерево + размеры + счётчики')
+    out.append('```')
+    for dirpath, _dirnames, filenames in walk_dirs(root):
+        rel = dirpath.relative_to(root)
+        depth = 0 if rel == Path('.') else len(rel.parts)
+        if rel != Path('.'):
+            out.append('  ' * (depth - 1) + rel.name + '/')
+        for f in filenames:
+            if should_skip_file(f):
+                continue
+            p = dirpath / f
+            ext = p.suffix.lower()
+            loc = file_lines(p)
+            info = ''
+            if ext in CODE_EXT:
+                items, _ = analyze_file(p)
+                parts = []
+                n_c = sum(1 for it in items if it[0] == 'class')
+                n_f = sum(1 for it in items if it[0] == 'func')
+                n_m = sum(1 for it in items if it[0] == 'method')
+                if n_c: parts.append(f'{n_c}c')
+                if n_f: parts.append(f'{n_f}f')
+                if n_m: parts.append(f'{n_m}m')
+                if parts:
+                    info = f' [{", ".join(parts)}]'
+            out.append('  ' * depth + f'{f} ({loc} loc){info}')
+    out.append('```')
+    out.append('')
+    out.append('*Полная карта с сигнатурами: `PROJECT_MAP.md`.*')
+    return '\n'.join(out)
+
+
 def main():
     ap = argparse.ArgumentParser(description='Генератор PROJECT_MAP.md')
     ap.add_argument('--root', default='.', help='Корень проекта (по умолчанию: текущая папка)')
@@ -246,6 +282,11 @@ def main():
     text = build_map(root)
     output.write_text(text, encoding='utf-8')
     print(f'[gen_map] OK: {output} ({output.stat().st_size} байт, {text.count(chr(10)) + 1} строк)')
+
+    short_path = output.parent / 'PROJECT_MAP_SHORT.md'
+    short_text = build_summary(root)
+    short_path.write_text(short_text, encoding='utf-8')
+    print(f'[gen_map] OK: {short_path} ({short_path.stat().st_size} байт, {short_text.count(chr(10)) + 1} строк)')
 
 
 if __name__ == '__main__':

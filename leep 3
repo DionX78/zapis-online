@@ -1,0 +1,10 @@
+[0;1;32m●[0m max-bot.service - MAX Booking Bot
+     Loaded: loaded (/etc/systemd/system/max-bot.service; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Fri 2026-11-20 06:56:12 MSK; 72ms ago
+   Main PID: 10946 (uvicorn)
+      Tasks: 1 (limit: 1138)
+     Memory: 3.4M
+     CGroup: /system.slice/max-bot.service
+             └─10946 /root/.pyenv/versions/3.12.0/bin/python3.12 /root/.pyenv/versions/3.12.0/bin/uvicorn app:app --host 127.0.0.1 --port 8080
+
+Nov 20 06:56:12 cv7919497.novalocal systemd[1]: Started MAX Booking Bot.

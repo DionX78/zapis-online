@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+httpx
+python-dotenv
+truststore
+jinja2
+python-multipart
+Pillow
+openpyxl
+reportlab

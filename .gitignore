@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+booking.db
+*.db
+static/
+mini/node_modules
+mini/dist
+backups/

@@ -8,3 +8,7 @@ static/
 mini/node_modules
 mini/dist
 backups/
+
+# runtime data, not for git
+backups/
+uploads/

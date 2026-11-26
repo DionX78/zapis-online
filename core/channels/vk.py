@@ -17,6 +17,8 @@ from core.channels.base import Channel, UserBlocked, ChannelError
 
 log = logging.getLogger(__name__)
 
+from core.channels.vk_text import vk_text
+
 VK_API = "https://api.vk.com/method/"
 VK_VERSION = "5.199"
 
@@ -138,7 +140,7 @@ async def _send(peer_id, text, buttons=None, attachments=None):
     params = {
         "peer_id": int(peer_id),
         "random_id": random.getrandbits(31),
-        "message": text or "",
+        "message": await vk_text(text) or "",
     }
     atts = [a for a in (attachments or []) if a]
     if atts:
@@ -191,7 +193,7 @@ class VkChannel(Channel):
                 # VK ждёт именно conversation_message_id (id в диалоге),
                 # а не глобальный message_id.
                 "conversation_message_id": int(message_id),
-                "message": text or "",
+                "message": await vk_text(text) or "",
             }
             keyboard = _keyboard(buttons)
             if keyboard:

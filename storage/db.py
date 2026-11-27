@@ -1646,6 +1646,29 @@ def get_client_platforms_batch(user_ids):
     return out
 
 
+def merge_client_into(stub_uid, real_uid):
+    """Переносит записи телефонного стаба (phone:...) на реального клиента."""
+    conn = db()
+    if not conn.execute("SELECT 1 FROM clients WHERE user_id=?", (real_uid,)).fetchone():
+        conn.close()
+        return False
+    tables = [r[0] for r in conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+    for t in tables:
+        if t == "clients":
+            continue
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(" + t + ")").fetchall()]
+        if "user_id" not in cols:
+            continue
+        try:
+            conn.execute("UPDATE " + t + " SET user_id=? WHERE user_id=?", (real_uid, stub_uid))
+        except sqlite3.IntegrityError:
+            conn.execute("DELETE FROM " + t + " WHERE user_id=?", (stub_uid,))
+    conn.execute("DELETE FROM clients WHERE user_id=?", (stub_uid,))
+    conn.commit()
+    conn.close()
+    return True
+
 def get_or_create_client_by_phone(org_id, first_name, last_name, middle_name, phone):
     import re as _re
     conn = db()
@@ -1722,6 +1745,13 @@ def upsert_client(user_id, org_id=None, first_name=None, last_name=None,
         fields.append("updated_at=?"); values.append(now); values.append(str(user_id))
         conn.execute(f"UPDATE clients SET {', '.join(fields)} WHERE user_id=?", values)
     else:
+        if not (first_name or "").strip() and not (last_name or "").strip():
+            import sys as _sys
+            import traceback as _tb
+            print("=== EMPTY CLIENT CREATED: user_id=" + str(user_id) + " ===",
+                  file=_sys.stderr, flush=True)
+            _tb.print_stack(file=_sys.stderr)
+
         conn.execute(
             "INSERT INTO clients (user_id, org_id, first_name, last_name, middle_name, phone, "
             "gender, birth_date, created_at, updated_at) "

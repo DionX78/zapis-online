@@ -73,7 +73,8 @@ async def mini_me(user: dict = Depends(require_user)):
         if client["org_id"] is None and start_org_id:
             upsert_client(uid, org_id=start_org_id)
     else:
-        upsert_client(uid, org_id=start_org_id, first_name=first_name, last_name=last_name)
+        if first_name or last_name:
+            upsert_client(uid, org_id=start_org_id, first_name=first_name, last_name=last_name)
 
     return {
         "user_id": uid,
@@ -364,6 +365,13 @@ async def mini_book(request: Request, user: dict = Depends(require_user)):
             result.error_code, (400, result.error_msg or "Не удалось создать запись")
         )
         raise HTTPException(status_code=code, detail=msg)
+
+    try:
+        import asyncio as _asyncio
+        from core import merge as merge_core
+        _asyncio.create_task(merge_core.maybe_queue_merge(org_id, str(uid), phone))
+    except Exception:
+        log.debug("merge hook skipped", exc_info=True)
 
     return {"ok": True, "id": result.request_id, "status": result.status}
 

@@ -16,6 +16,7 @@ from handlers import reminder_callbacks as rem_cb
 from handlers import client_confirm_callbacks as cc_cb
 from handlers import visit_callbacks as vis_cb
 from handlers import unsub_callbacks as unsub_cb
+from handlers import merge_callbacks as merge_cb
 from handlers import report_callbacks as rep_cb
 from handlers import review_callbacks as rv_cb
 from core import waitlist as wl_core
@@ -94,6 +95,8 @@ async def _handle_message(uid, text, platform="max"):
 
 async def _handle_callback(uid, payload, message_id, platform="max"):
     if await unsub_cb.handle(uid, payload, message_id):
+        return
+    if await merge_cb.handle(uid, payload, message_id):
         return
     if await wl_core.handle_callback(uid, payload, message_id):
         return

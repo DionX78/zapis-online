@@ -1,6 +1,6 @@
 # PROJECT MAP — max_booking_bot
 
-*Сгенерировано: 2026-11-26 10:01*
+*Сгенерировано: 2026-11-27 08:24*
 *Скрипт: `tools/gen_map.py`. Файл автогенерируемый — не редактировать вручную.*
 
 ## Дерево
@@ -10,9 +10,9 @@
 CHANGELOG.md
 PLAN.md
 PROJECT_MAP.md
+PROJECT_MAP_SHORT.md
 app.py
 backup_db.sh
-badge_front_dump.txt
 booking.db
 config.py
 deploy.sh
@@ -20,7 +20,6 @@ init_project.py
 max-bot.service
 nginx.conf.snippet
 package-lock.json
-project_dump25.11.2026_060239.txt
 register_webhook.py
 requirements.txt
 scan_project.py
@@ -36,6 +35,7 @@ core/
   geo.py
   ics.py
   max_client.py
+  merge.py
   messaging.py
   notify.py
   notify_ics.py
@@ -50,6 +50,7 @@ core/
     max.py
     registry.py
     vk.py
+    vk_text.py
   webhook_adapters/
     max.py
     vk.py
@@ -58,6 +59,7 @@ handlers/
   admin.py
   booking.py
   client_confirm_callbacks.py
+  merge_callbacks.py
   reminder_callbacks.py
   report_callbacks.py
   request_callbacks.py
@@ -139,13 +141,15 @@ tools/
 
 ### `.env` (5 стр.)
 
-### `.gitignore` (10 стр.)
+### `.gitignore` (14 стр.)
 
 ### `CHANGELOG.md` (16 стр.)
 
-### `PLAN.md` (1196 стр.)
+### `PLAN.md` (1219 стр.)
 
-### `PROJECT_MAP.md` (1307 стр.)
+### `PROJECT_MAP.md` (1308 стр.)
+
+### `PROJECT_MAP_SHORT.md` (137 стр.)
 
 ### `app.py` (74 стр.)
 импорты: `config`, `core`, `fastapi`, `routers`, `storage`, `truststore`
@@ -154,9 +158,7 @@ tools/
 ### `backup_db.sh` (26 стр.)
 _пусто / без явных объявлений_
 
-### `badge_front_dump.txt` (858 стр.)
-
-### `booking.db` (1148 стр.)
+### `booking.db` (1203 стр.)
 
 ### `config.py` (69 стр.)
 импорты: `dotenv`
@@ -174,8 +176,6 @@ _пусто / без явных объявлений_
 ### `nginx.conf.snippet` (22 стр.)
 
 ### `package-lock.json` (6 стр.)
-
-### `project_dump25.11.2026_060239.txt` (36518 стр.)
 
 ### `register_webhook.py` (36 стр.)
 импорты: `config`, `httpx`, `truststore`
@@ -264,7 +264,7 @@ _пусто / без явных объявлений_
 - ƒ def build_client_export_xlsx(data, client, for_client)
 - ƒ def build_client_export_pdf(data, client, for_client)
 
-### `core/dispatcher.py` (127 стр.)
+### `core/dispatcher.py` (130 стр.)
 импорты: `config`, `core`, `handlers`
 - ƒ async def route(update: Update) — Маршрутизация одного Update. Не зависит от платформы.
 - ƒ async def _handle_message(uid, text, platform)
@@ -298,13 +298,36 @@ _пусто / без явных объявлений_
 - ƒ async def set_commands(commands: list) — Регистрирует команды бота.
 - ƒ async def get_me() — Возвращает информацию о боте.
 
-### `core/messaging.py` (190 стр.)
+### `core/merge.py` (289 стр.)
 импорты: `core`, `storage`
+- ƒ def _canon(phone)
+- ƒ def _ensure_table(conn)
+- ƒ def find_other_clients_by_phone(org_id, user_id, phone) — Реальные клиенты (не phone:...) с тем же телефоном, кроме самого себя.
+- ƒ def create_pending_merges(org_id, user_id, phone) — Заявки на склейку с каждым реальным клиентом с тем же телефоном.
+- ƒ def get_pending_merge(merge_id)
+- ƒ def confirm_merge(merge_id, which)
+- ƒ def set_merge_status(merge_id, status)
+- ƒ def finalize_merge(keep_uid, gone_uid) — Склейка: сначала дозаполняем пустые поля keep данными gone,
+- ƒ def _merge_buttons(merge_id)
+- ƒ async def _send_merge_request(uid, text, merge_id)
+- ƒ async def _send_simple(uid, text)
+- ƒ async def maybe_queue_merge(org_id, user_id, phone) — Вызывается после успешной записи: ищет профили с тем же телефоном
+- ƒ async def handle_response(merge_id, uid, yes)
+
+### `core/messaging.py` (383 стр.)
+импорты: `config`, `core`, `httpx`, `storage`
 - ƒ def _should_duplicate(duplicate, org_id) -> bool — Дублировать ли отправку во все каналы клиента.
 - ƒ async def send_to_client(user_id, text, buttons, fmt, org_id, duplicate) — Отправляет сообщение клиенту. Возвращает (status, error).
-- ƒ async def send_to_client_raw(user_id, text, buttons, fmt) — Отправляет сообщение клиенту. Возвращает dict (ответ API) или бросает.
-- ƒ async def send_to_client_with_image_raw(user_id, text, image_token, buttons, fmt) — Сообщение с картинкой. Возвращает dict или бросает. Для рассылок.
-- ƒ async def send_to_client_with_file_raw(user_id, text, file_token, buttons, fmt) — Сообщение с файлом. Возвращает dict или бросает. Для .ics/экспортов.
+- ƒ def _client_org_id(uid_str)
+- ƒ async def _send_raw_multichannel(uid_str, org_id, duplicate, send_one)
+- ƒ async def send_to_client_raw(user_id, text, buttons, fmt, org_id, duplicate) — Текст. Бросает UserBlocked/ChannelError. duplicate — во все каналы клиента.
+- ƒ def _stored_image_bytes(token) — Байты картинки по токену: blob в БД или файл на диске.
+- ƒ def _vk_token()
+- ƒ def _vk_api()
+- ƒ def _vk_version()
+- ƒ async def _vk_upload_photo(content, mime) — Загружает картинку в VK, возвращает attachment 'photo{id}_{id}'.
+- ƒ async def send_to_client_with_image_raw(user_id, text, image_token, buttons, fmt, org_id, duplicate) — Сообщение с картинкой. МАХ получает свой токен, ВК — своё вложение.
+- ƒ async def send_to_client_with_file_raw(user_id, text, file_token, buttons, fmt, org_id, duplicate) — Сообщение с файлом (.ics и т.п.). duplicate/org_id — как выше.
 - ƒ async def edit_message_for_client(user_id, message_id, text, buttons, fmt) — Редактирует сообщение. Возвращает dict | None. Не бросает.
 - ƒ async def delete_message_for_client(user_id, message_id) — Удаляет сообщение. Возвращает dict | None. Не бросает.
 - ƒ async def upload_file_for_client(user_id, content, filename: str, mime: str, upload_type: str) -> str — Загружает файл в канал клиента. Возвращает token или бросает ChannelError.
@@ -400,7 +423,7 @@ _пусто / без явных объявлений_
 -   · async def upload_file(self, content, filename: str, mime: str, upload_type: str) -> str
 -   · async def set_commands(self, commands: list) -> None
 
-### `core/channels/max.py` (65 стр.)
+### `core/channels/max.py` (119 стр.)
 импорты: `core`
 - 🏛 **MaxChannel**
 -   · async def send_message(self, user_id, text, buttons, fmt)
@@ -410,6 +433,7 @@ _пусто / без явных объявлений_
 -   · async def delete_message(self, user_id, message_id)
 -   · async def upload_file(self, content, filename, mime, upload_type)
 -   · async def set_commands(self, commands)
+- ƒ def _cache_max_upload(result, content, mime)
 
 ### `core/channels/registry.py` (99 стр.)
 импорты: `core`, `storage`
@@ -419,7 +443,7 @@ _пусто / без явных объявлений_
 - ƒ def get_channels_for_client(user_id, org_id) — Все доступные каналы клиента — в порядке приоритета отправки.
 - ƒ def get_channel_for_client(user_id, org_id) -> tuple[Channel, str, str] — Возвращает (channel, platform_user_id, platform) для основной отправки.
 
-### `core/channels/vk.py` (279 стр.)
+### `core/channels/vk.py` (281 стр.)
 импорты: `core`, `httpx`, `storage`
 - ƒ def _load_bot() — Активный VK-бот (token, group_id) с кэшем на минуту.
 - ƒ def reset_bot_cache() — Сбросить кэш бота (после смены токена в админке).
@@ -436,6 +460,11 @@ _пусто / без явных объявлений_
 -   · async def delete_message(self, user_id, message_id)
 -   · async def upload_file(self, content, filename, mime, upload_type, user_id) — Загрузка в VK. Фото — через photos, остальное — через docs.
 -   · async def set_commands(self, commands) — VK не поддерживает список команд бота в интерфейсе — no-op.
+
+### `core/channels/vk_text.py` (68 стр.)
+импорты: `httpx`
+- ƒ async def _shorten(url) — Сокращает URL через clck.ru; при ошибке возвращает как есть.
+- ƒ async def vk_text(text) — VK не рендерит Markdown. Готовим текст:
 
 ### `core/webhook_adapters/max.py` (75 стр.)
 импорты: `core`
@@ -476,6 +505,10 @@ _пусто / без явных объявлений_
 импорты: `core`, `storage`
 - ƒ async def handle(uid: int, payload: str, message_id: str | None) -> bool
 - ƒ async def _edit_or_send(uid, message_id, text, buttons)
+
+### `handlers/merge_callbacks.py` (26 стр.)
+импорты: `core`
+- ƒ async def handle(uid, payload, message_id)
 
 ### `handlers/reminder_callbacks.py` (130 стр.)
 импорты: `core`, `storage`
@@ -1032,7 +1065,7 @@ _пусто / без явных объявлений_
 - ƒ async def admin_upload_file(upload_id: int, request: Request, ctx: AdminCtx)
 - ƒ async def public_upload_file(public_token: str) — Публичная отдача картинки для <img src="...">.
 
-### `routers/mini_app.py` (587 стр.)
+### `routers/mini_app.py` (595 стр.)
 импорты: `core`, `fastapi`, `handlers`, `storage`
 - ƒ async def mini_me(user: dict)
 - ƒ async def mini_set_favorite_doctor(request: Request, user: dict)
@@ -1064,7 +1097,7 @@ _пусто / без явных объявлений_
 ### `storage/__init__.py` (0 стр.)
 _пусто / без явных объявлений_
 
-### `storage/db.py` (5674 стр.)
+### `storage/db.py` (5704 стр.)
 импорты: `config`
 - ƒ def db() — Соединение с БД: ждёт блокировку до 30 с, WAL, row_factory.
 - ƒ def db_ctx() — Контекстный менеджер для соединения с БД.
@@ -1125,6 +1158,7 @@ _пусто / без явных объявлений_
 - ƒ def search_clients(org_id: int, query: str, limit: int)
 - ƒ def get_client_platforms(user_id) — Платформы клиента по client_identities: список ['max', 'vk'].
 - ƒ def get_client_platforms_batch(user_ids) — Каналы пачки клиентов: {user_id: ['max', 'vk']}.
+- ƒ def merge_client_into(stub_uid, real_uid) — Переносит записи телефонного стаба (phone:...) на реального клиента.
 - ƒ def get_or_create_client_by_phone(org_id, first_name, last_name, middle_name, phone)
 - ƒ def upsert_client(user_id, org_id, first_name, last_name, middle_name, phone, gender, birth_date)
 - ƒ def _ensure_identity_for_user(conn, user_id: str) -> None — Создаёт MAX-паспорт для «настоящего» user_id (не phone:...).

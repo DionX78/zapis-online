@@ -1,25 +1,24 @@
 # PROJECT MAP (SHORT) — max_booking_bot
 
-*Сгенерировано: 2026-11-26 10:01*
+*Сгенерировано: 2026-11-27 08:24*
 
 ## Дерево + размеры + счётчики
 ```
 .env (5 loc)
-.gitignore (10 loc)
+.gitignore (14 loc)
 CHANGELOG.md (16 loc)
-PLAN.md (1196 loc)
-PROJECT_MAP.md (1308 loc)
+PLAN.md (1219 loc)
+PROJECT_MAP.md (1342 loc)
+PROJECT_MAP_SHORT.md (137 loc)
 app.py (74 loc) [1f]
 backup_db.sh (26 loc)
-badge_front_dump.txt (858 loc)
-booking.db (1148 loc)
+booking.db (1203 loc)
 config.py (69 loc) [1f]
 deploy.sh (151 loc)
 init_project.py (696 loc) [2f]
 max-bot.service (15 loc)
 nginx.conf.snippet (22 loc)
 package-lock.json (6 loc)
-project_dump25.11.2026_060239.txt (36518 loc)
 register_webhook.py (36 loc)
 requirements.txt (10 loc)
 scan_project.py (273 loc) [7f]
@@ -31,11 +30,12 @@ core/
   booking.py (682 loc) [3c, 5f]
   broadcasts.py (880 loc) [23f]
   client_exports.py (657 loc) [3f]
-  dispatcher.py (127 loc) [4f]
+  dispatcher.py (130 loc) [4f]
   geo.py (65 loc) [4f]
   ics.py (107 loc) [4f]
   max_client.py (414 loc) [1c, 9f]
-  messaging.py (190 loc) [8f]
+  merge.py (289 loc) [13f]
+  messaging.py (383 loc) [15f]
   notify.py (32 loc) [1f]
   notify_ics.py (64 loc) [1f]
   reminders.py (668 loc) [18f]
@@ -46,9 +46,10 @@ core/
   channels/
     __init__.py (0 loc)
     base.py (58 loc) [3c, 7m]
-    max.py (65 loc) [1c, 7m]
+    max.py (119 loc) [1c, 1f, 7m]
     registry.py (99 loc) [5f]
-    vk.py (279 loc) [1c, 7f, 7m]
+    vk.py (281 loc) [1c, 7f, 7m]
+    vk_text.py (68 loc) [2f]
   webhook_adapters/
     max.py (75 loc) [2f]
     vk.py (105 loc) [4f]
@@ -57,6 +58,7 @@ handlers/
   admin.py (127 loc) [3f]
   booking.py (403 loc) [11f]
   client_confirm_callbacks.py (154 loc) [2f]
+  merge_callbacks.py (26 loc) [1f]
   reminder_callbacks.py (130 loc) [2f]
   report_callbacks.py (97 loc) [1f]
   request_callbacks.py (112 loc) [2f]
@@ -124,12 +126,12 @@ routers/
   admin_reviews.py (89 loc) [2f]
   admin_settings.py (160 loc) [3f]
   admin_uploads.py (169 loc) [3f]
-  mini_app.py (587 loc) [12f]
+  mini_app.py (595 loc) [12f]
   webhook.py (100 loc) [4f]
   webhook_vk.py (170 loc) [4f]
 storage/
   __init__.py (0 loc)
-  db.py (5674 loc) [224f]
+  db.py (5704 loc) [225f]
 tools/
   gen_map.py (293 loc) [11f]
 ```
